@@ -45,9 +45,12 @@ Both integer and decimal JSON tokens decode to `Decimal`, so exact comparisons
 do not silently round a long fraction through a binary float. Numeric spellings
 such as `1` and `1.0` compare equal. Type checks keep booleans distinct from
 numbers. Explicit exponent magnitude is limited to 1,000,000 before parsing;
-leading zeros are removed before the bounded integer conversion. This avoids
+leading zeros are removed before the bounded integer conversion and before the
+normalized number token reaches Decimal. This avoids
 depending on differing exponent limits in Python's decimal backends. Boundary
 tests include both signs and exponent encodings with thousands of digits.
+`scripts/check_python_decimal.py` runs the core suite with the standard-library
+Python fallback in an isolated process, without changing installed interpreters.
 
 JSON Pointer escaping follows [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901).
 The report supplies no old/new values and is not an executable patch. IDs and

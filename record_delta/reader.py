@@ -32,14 +32,16 @@ def unique_object(pairs: list[tuple[str, object]]) -> dict:
 def finite_number(token: str) -> Decimal:
     # Decimal backends differ in the largest exponent they accept. Enforce a
     # portable bound before constructing the number or converting a huge int.
-    _, marker, exponent = token.lower().partition("e")
+    coefficient, marker, exponent = token.lower().partition("e")
     if marker:
         magnitude = exponent.lstrip("+-").lstrip("0") or "0"
         if len(magnitude) > len(str(MAX_ABS_EXPONENT)) or int(magnitude) > MAX_ABS_EXPONENT:
             raise InputError(f"numeric exponent magnitude exceeds {MAX_ABS_EXPONENT}")
+        sign = "-" if exponent.startswith("-") else ""
+        token = coefficient + "e" + sign + magnitude
     try:
         number = Decimal(token)
-    except InvalidOperation as exc:
+    except (InvalidOperation, ValueError) as exc:
         raise InputError("unsupported JSON number") from exc
     if not number.is_finite():
         raise InputError("JSON numbers must be finite")

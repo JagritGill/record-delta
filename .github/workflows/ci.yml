@@ -23,6 +23,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Unit, exhaustive merge, failure, and CLI tests
         run: python -m unittest discover -s tests -v
+      - name: Core tests with the Python decimal fallback
+        run: python scripts/check_python_decimal.py
       - name: Release inventory and credential patterns
         run: python scripts/check_release.py
       - name: Offline comparison demo

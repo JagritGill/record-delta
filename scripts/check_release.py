@@ -11,7 +11,8 @@ EXPECTED = {
     "record_delta/__init__.py", "record_delta/__main__.py", "record_delta/reader.py",
     "record_delta/diff.py", "record_delta/merge.py", "record_delta/report.py",
     "docs/architecture.md", "examples/before.jsonl", "examples/after.jsonl", "examples/unsorted.jsonl",
-    "scripts/check_release.py", "tests/test_core.py", "tests/test_cli.py", "tests/test_release.py",
+    "scripts/check_release.py", "scripts/check_python_decimal.py",
+    "tests/test_core.py", "tests/test_cli.py", "tests/test_release.py",
 }
 IGNORED = {".git", "__pycache__", "out", ".venv"}
 PATTERNS = {

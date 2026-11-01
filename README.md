@@ -19,6 +19,7 @@ python3 -m record_delta examples/before.jsonl examples/after.jsonl
 python3 -m record_delta examples/before.jsonl examples/after.jsonl --format jsonl
 python3 -m record_delta examples/before.jsonl examples/after.jsonl --summary-only
 python3 -m unittest discover -s tests -v
+python3 scripts/check_python_decimal.py
 python3 scripts/check_release.py
 ```
 
@@ -86,7 +87,8 @@ Each physical line is one JSON object, for example:
 - Duplicate object keys, unpaired Unicode surrogates, and nonstandard numeric
   constants such as `NaN` and `Infinity` are rejected. Explicit numeric exponent
   magnitude is capped at **1,000,000** before decimal parsing, keeping this limit
-  consistent across Python builds.
+  consistent across Python builds. Leading zeros in exponent spellings are
+  normalized before parsing.
 
 The tool deliberately does not sort your exports. Automatic in-memory sorting
 would defeat its streaming input design. Export or prepare data in the declared
@@ -118,7 +120,8 @@ memory/disk behavior, exact-number choices, and publication guarantees.
 Tests cover **4,096 exhaustive membership/modification combinations**, structural
 diff symmetry, pointer escaping, numeric precision, lazy consumption, invalid
 input, output collision races, and failed-write cleanup. CI runs on Python
-3.11 and 3.15. The release check scans the exact file inventory and known
+3.11 and 3.15, with additional core tests against Python's decimal fallback.
+The release check scans the exact file inventory and known
 credential/private-path patterns; it is a heuristic, not a comprehensive audit.
 
 This is a focused export-comparison tool. It does not query databases, infer

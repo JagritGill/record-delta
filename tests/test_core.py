@@ -24,9 +24,12 @@ class ReaderTests(unittest.TestCase):
         self.assertEqual(values["big"], Decimal("1e10000"))
 
     def test_portable_explicit_exponent_boundary(self):
-        for spelling in ("1e1000000", "1e-1000000", "1e+0001000000", "1E" + "0" * 5000 + "1"):
+        accepted = [("1e1000000", "1e1000000"), ("1e-1000000", "1e-1000000"),
+                    ("1e+0001000000", "1e1000000"), ("1E" + "0" * 5000 + "1", "1e1"),
+                    ("1e-" + "0" * 5000 + "1", "1e-1")]
+        for spelling, canonical in accepted:
             with self.subTest(spelling=spelling[:30]):
-                self.assertEqual(decode('{"id":"a","n":' + spelling + '}')[0].data["n"], Decimal(spelling))
+                self.assertEqual(decode('{"id":"a","n":' + spelling + '}')[0].data["n"], Decimal(canonical))
         for spelling in ("1e1000001", "1e-1000001", "1e" + "9" * 5000):
             with self.subTest(spelling=spelling[:30]), self.assertRaisesRegex(InputError, "exponent magnitude"):
                 decode('{"id":"a","n":' + spelling + '}')
