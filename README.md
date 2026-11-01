@@ -84,8 +84,9 @@ Each physical line is one JSON object, for example:
 - A physical line, including its line ending, is at most **1 MiB**. Structural
   nesting is capped at 64 levels, with the root at level zero.
 - Duplicate object keys, unpaired Unicode surrogates, and nonstandard numeric
-  constants such as `NaN` and `Infinity` are rejected. Numbers must be representable
-  by Python's `Decimal`; extremely large exponent encodings may be rejected.
+  constants such as `NaN` and `Infinity` are rejected. Explicit numeric exponent
+  magnitude is capped at **1,000,000** before decimal parsing, keeping this limit
+  consistent across Python builds.
 
 The tool deliberately does not sort your exports. Automatic in-memory sorting
 would defeat its streaming input design. Export or prepare data in the declared

@@ -7,6 +7,7 @@ import json
 
 MAX_LINE_BYTES = 1_048_576
 MAX_DEPTH = 64
+MAX_ABS_EXPONENT = 1_000_000
 
 
 class InputError(ValueError):
@@ -29,6 +30,13 @@ def unique_object(pairs: list[tuple[str, object]]) -> dict:
 
 
 def finite_number(token: str) -> Decimal:
+    # Decimal backends differ in the largest exponent they accept. Enforce a
+    # portable bound before constructing the number or converting a huge int.
+    _, marker, exponent = token.lower().partition("e")
+    if marker:
+        magnitude = exponent.lstrip("+-").lstrip("0") or "0"
+        if len(magnitude) > len(str(MAX_ABS_EXPONENT)) or int(magnitude) > MAX_ABS_EXPONENT:
+            raise InputError(f"numeric exponent magnitude exceeds {MAX_ABS_EXPONENT}")
     try:
         number = Decimal(token)
     except InvalidOperation as exc:
