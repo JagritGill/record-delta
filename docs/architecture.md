@@ -41,14 +41,16 @@ than using edit-distance alignment. Adding or removing a whole subtree emits
 one path; replacing a type emits one `changed` path. Traversal order is stable
 but is not a global lexicographic sort of all final pointer strings.
 
-Both integer and decimal JSON tokens decode to `Decimal`, so exact comparisons
-do not silently round a long fraction through a binary float. Numeric spellings
+Both integer and decimal JSON tokens decode through Decimal's public
+sign/digits/exponent tuple constructor. This preserves the coefficient without
+the pure-Python backend's whole-coefficient integer-string conversion. Exact
+comparisons do not silently round a long fraction through a binary float. Numeric spellings
 such as `1` and `1.0` compare equal. Type checks keep booleans distinct from
 numbers. Explicit exponent magnitude is limited to 1,000,000 before parsing;
-leading zeros are removed before the bounded integer conversion and before the
-normalized number token reaches Decimal. This avoids
+leading zeros are removed before the bounded exponent integer conversion. This avoids
 depending on differing exponent limits in Python's decimal backends. Boundary
-tests include both signs and exponent encodings with thousands of digits.
+tests include both signs, exponent encodings with thousands of digits, and
+5,000-digit integer and fractional coefficients.
 `scripts/check_python_decimal.py` runs the core suite with the standard-library
 Python fallback in an isolated process, without changing installed interpreters.
 

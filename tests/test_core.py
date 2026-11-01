@@ -34,6 +34,17 @@ class ReaderTests(unittest.TestCase):
             with self.subTest(spelling=spelling[:30]), self.assertRaisesRegex(InputError, "exponent magnitude"):
                 decode('{"id":"a","n":' + spelling + '}')
 
+    def test_long_coefficients_are_exact_on_both_backends(self):
+        for spelling, exponent in (("1" * 5000, 0), ("0." + "1" * 5000, -5000)):
+            with self.subTest(exponent=exponent):
+                value = decode('{"id":"a","n":' + spelling + '}')[0].data["n"]
+                equivalent = decode('{"id":"a","n":' + spelling + 'e0}')[0].data["n"]
+                changed = decode('{"id":"a","n":' + spelling[:-1] + '2}')[0].data["n"]
+                self.assertEqual(value.as_tuple().digits, (1,) * 5000)
+                self.assertEqual(value.as_tuple().exponent, exponent)
+                self.assertEqual(differences(value, equivalent), ())
+                self.assertEqual(differences(value, changed), (FieldChange("", "changed"),))
+
     def test_custom_key(self):
         output = list(records(io.BytesIO(b'{"sku":"a"}\n'), key="sku"))
         self.assertEqual(output[0].id, "a")

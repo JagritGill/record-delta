@@ -33,14 +33,20 @@ def finite_number(token: str) -> Decimal:
     # Decimal backends differ in the largest exponent they accept. Enforce a
     # portable bound before constructing the number or converting a huge int.
     coefficient, marker, exponent = token.lower().partition("e")
+    scale = 0
     if marker:
         magnitude = exponent.lstrip("+-").lstrip("0") or "0"
         if len(magnitude) > len(str(MAX_ABS_EXPONENT)) or int(magnitude) > MAX_ABS_EXPONENT:
             raise InputError(f"numeric exponent magnitude exceeds {MAX_ABS_EXPONENT}")
-        sign = "-" if exponent.startswith("-") else ""
-        token = coefficient + "e" + sign + magnitude
+        scale = int(magnitude) * (-1 if exponent.startswith("-") else 1)
+    sign = int(coefficient.startswith("-"))
+    integral, _, fraction = coefficient.lstrip("-").partition(".")
+    digits = tuple(ord(char) - ord("0") for char in integral + fraction)
     try:
-        number = Decimal(token)
+        # The pure-Python string constructor converts the whole coefficient to
+        # int, whose digit limit can differ across interpreters. The public
+        # tuple constructor preserves the exact digits without that conversion.
+        number = Decimal((sign, digits, scale - len(fraction)))
     except (InvalidOperation, ValueError) as exc:
         raise InputError("unsupported JSON number") from exc
     if not number.is_finite():
