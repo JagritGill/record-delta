@@ -1,0 +1,3 @@
+{"seats":1.0,"plan":"starter","id":"acct-001"}
+{"id":"acct-002","plan":"team","profile":{"region":"west"},"features":["export","audit"]}
+{"id":"acct-004","plan":"starter","seats":1}
