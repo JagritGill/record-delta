@@ -7,6 +7,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
+    "AGENTS.md",
     ".gitignore", ".github/workflows/ci.yml", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md",
     "record_delta/__init__.py", "record_delta/__main__.py", "record_delta/reader.py",
     "record_delta/diff.py", "record_delta/merge.py", "record_delta/report.py",
